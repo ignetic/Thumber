@@ -213,8 +213,9 @@ class Thumber {
 	  // create dest array
 	  $dest = array();
 	  $dest["dirname"] = $this->thumb_cache_dirname;
-	  $relevant_params = array($this->params["width"], $this->params["height"], $this->params["crop"], $this->params["page"]);
-	  $param_str = '_' . implode("_", $relevant_params);
+	  
+	  $cropped = ($this->params["crop"] == 'yes') ? '_cropped' : '';
+	  $param_str = '_pg' . $this->params["page"] . '_' .  $this->params["dimensions"] . $cropped;
 	  $dest["basename"] = $source["filename"] . $param_str . "." . $this->params["extension"];
 		$dest["fullpath"] = $this->thumb_cache_dirname . '/' . $dest["basename"];
 		$dest = array_merge($dest, pathinfo($dest["fullpath"]));
