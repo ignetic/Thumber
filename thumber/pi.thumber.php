@@ -81,6 +81,9 @@ class Thumber {
 				}
 			}
 		}
+		
+		// This is just for convenience
+		$this->params['dimensions'] = $this->params['width'] . 'x' . $this->params['height'];
   }
 
 	/**
@@ -169,7 +172,7 @@ class Thumber {
 			// TODO: Sort out cropping
 		}
 		
-		$exec_str = "convert -resize " . $this->params["width"] . "x" . $this->params["height"] . '^ ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
+		$exec_str = "convert -resize " . $this->params["dimensions"] . '^ ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
 		
 		$error = exec($exec_str);
 		
