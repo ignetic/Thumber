@@ -5,7 +5,7 @@ __Creates image thumbnails from PDF files.__
 Thumber generates a thumbnail for your PDFs. You can call it using a single tag in your template.
 
 ### Requirements:
- - This plugin requires imagemagick and ghostscript to be installed
+ - This plugin requires [ImageMagick](http://www.imagemagick.org/) and [Ghostscript](http://www.ghostscript.com/) to be installed
  - You should create a directory for your cached thumbnails to live. The default directory is specified as `/images/thumber`. Thumber should have permissions to write to this directory
 
 ### Example usage:
