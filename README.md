@@ -5,8 +5,8 @@ __Creates image thumbnails from PDF files.__
 Thumber generates a thumbnail for your PDFs. You can call it using a single tag in your template.
 
 ### Requirements:
- - This plugin requires imagemagick and ghostscript to be installed.
- - You should create a directory for your cached thumbnails to live. The default directory is specified as `/images/thumber`. Thumber should have permissions to write to this directory.
+ - This plugin requires imagemagick and ghostscript to be installed
+ - You should create a directory for your cached thumbnails to live. The default directory is specified as `/images/thumber`. Thumber should have permissions to write to this directory
 
 ### Example usage:
 
@@ -15,14 +15,14 @@ Thumber generates a thumbnail for your PDFs. You can call it using a single tag 
 ```
 
 ### Parameters:
- - `src`: The source PDF. This parameter is required.
- - `width`: The width of the generated thumbnail.
- - `height`: The height of the generated thumbnail.
- - `page`: The page of the PDF used to generate the thumbnail. _[Default: __1__]_
- - `extension`: The file type of the generated thumbnail. _[Default: __png__]_
- - `link`: Wrap the thumbnail in a link to the PDF. _[Default: __no__]_
+ - `src`: The source PDF ___[Required]___
+ - `width`: The width of the generated thumbnail
+ - `height`: The height of the generated thumbnail
+ - `page`: The page of the PDF used to generate the thumbnail ___[Default: 1]___
+ - `extension`: The file type of the generated thumbnail ___[Default: png]___
+ - `link`: Wrap the thumbnail in a link to the PDF ___[Default: no]___
 
 Any other parameters will be passed directly to the generated html snippet - so if you want to add an `id` or `class`, just add them as parameters.
 
 ### Todos:
- - We plan to add a `crop` parameter, to determine whether the thumbnail should be cropped.
+ - We plan to add a `crop` parameter, to determine whether the thumbnail should be cropped
