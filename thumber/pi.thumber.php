@@ -47,8 +47,8 @@ class Thumber {
 		/** -------------------------------------*/
 		$default_params = array(
 			// TODO: width and height should be a single param here
-			'width'		=> '0',
-			'height'		=> '0',
+			'width'		=> '84',
+			'height'		=> '108',
 			'crop'		=> 'no',
 			'page'		=> '1',
 			'extension'		=> 'png',
@@ -56,17 +56,28 @@ class Thumber {
 		);
 		
 		$this->params = $default_params;
+		
+		$width = $this->EE->TMPL->fetch_param('width', '');
+		$height = $this->EE->TMPL->fetch_param('height', '');		
+		if ($width || $height) {
+			$this->params['width'] = $width;
+			$this->params['height'] = $height;
+		}
 
 		/** -------------------------------------
 		/**  Loop through input params, set values
 		/** -------------------------------------*/
 		if($this->EE->TMPL->tagparams) {
 			foreach ($this->EE->TMPL->tagparams as $key => $value) {
-				if(array_key_exists($key, $this->params)) {
-					$this->params[$key] = $value;
-				} else {
-					// these will just be passed straight to the img tag
-					$this->custom_params[$key] = $value;
+				// ignore width and height as special parameters
+				if($key != 'width' && $key != 'height') {
+					if (array_key_exists($key, $this->params)) {
+						// if it's in the default array, it's used by the plugin
+						$this->params[$key] = $value;
+					} else {
+						// otherwise, it'll just be passed straight to the img tag
+						$this->custom_params[$key] = $value;
+					}
 				}
 			}
 		}
@@ -265,7 +276,6 @@ Any other parameters will be passed directly to the generated html snippet - so
 
 Todos:
  - We plan to add a crop parameter, to determine whether the thumbnail should be cropped.
- - It should be easy to set the default behaviour of the width and height parameters from inside the plugin.
 <?php
 		$buffer = ob_get_contents();
 		ob_end_clean();
