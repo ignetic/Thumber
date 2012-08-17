@@ -238,7 +238,6 @@ class Thumber {
     $dest["basename"] = $dest["filename"] . "." . $dest["extension"];
     $dest["fullpath"] = $this->EE->functions->remove_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
     $dest["url"] = $this->EE->functions->remove_double_slashes($this->EE->config->item('site_url') . '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
-    die(var_dump($dest));
     
     // check whether the image is cached
     if (!file_exists($dest["fullpath"])) {
