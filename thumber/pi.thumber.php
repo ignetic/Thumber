@@ -273,7 +273,7 @@ class Thumber {
 Thumber generates thumbnails from your PDFs. You can call it using a single tag in your template.
 
 Example usage:
-  {exp:thumber:create src="/uploads/documents/yourfile.pdf" page='1' extension='jpg' height='250' class='awesome' title='Click to download' link='yes'}
+  {exp:thumber:create src='/uploads/documents/yourfile.pdf' page='1' extension='jpg' height='250' class='awesome' title='Click to download' link='yes'}
 
 Parameters:
  - src: The source PDF. [Required]
