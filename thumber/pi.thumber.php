@@ -182,7 +182,7 @@ class Thumber {
 		$error = exec($exec_str);
 		
 		if($error) {
-		  $this->EE->TMPL->log_item($error);
+		  $this->EE->TMPL->log_item('**Thumber** ' . $error);
 			return false;
 		}
 		
