@@ -59,7 +59,9 @@ class Thumber {
 		
 		$width = $this->EE->TMPL->fetch_param('width', '');
 		$height = $this->EE->TMPL->fetch_param('height', '');		
+		
 		if ($width || $height) {
+			// if either is specified, override both defaults
 			$this->params['width'] = $width;
 			$this->params['height'] = $height;
 		}
@@ -168,11 +170,14 @@ class Thumber {
 	private function generate_conversion($source, $dest) {
 		$page = intval($this->params["page"]) - 1;
 		
+		// Force the specified dimensions, even if it means not preserving aspect ratio
+		$force_dimensions = ($this->params["width"] && $this->params["height"]) ? '!' : '';
+		
 		if($this->params['crop'] == 'yes') {
 			// TODO: Sort out cropping
 		}
 		
-		$exec_str = "convert -resize " . $this->params["dimensions"] . '^ ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
+		$exec_str = "convert -resize " . $this->params["dimensions"] . $force_dimensions . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
 		
 		$error = exec($exec_str);
 		
