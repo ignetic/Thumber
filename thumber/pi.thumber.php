@@ -29,7 +29,7 @@ $plugin_info = array(
 	'pi_version'	=> '1.0',
 	'pi_author'		=> 'Rob Hodges and Andy Lulham',
 	'pi_author_url'	=> 'http://www.electricputty.co.uk',
-	'pi_description'=> 'Creates image thumbnails from PDF files',
+	'pi_description'=> 'Create image thumbnails from PDF files',
 	'pi_usage'		=> Thumber::usage()
 );
 
@@ -49,7 +49,7 @@ class Thumber {
 			// TODO: width and height should be a single param here
 			'width'		=> '84',
 			'height'		=> '108',
-			'crop'		=> 'no',
+			'crop'		=> 'no', // not currently used
 			'page'		=> '1',
 			'extension'		=> 'png',
 			'link'		=> 'no'
@@ -263,28 +263,28 @@ class Thumber {
 		ob_start();
 ?>
 
-Thumber generates a thumbnail for your PDFs. You can call it using a single tag in your template.
+Thumber generates thumbnails from your PDFs. You can call it using a single tag in your template.
 
 Requirements:
- - This plugin requires imagemagick and ghostscript to be installed.
+ - This plugin requires ImageMagick and Ghostscript to be installed
  - You should create a directory for your cached thumbnails to live. The default directory is specified as
-	 /images/thumber . Thumber should have permissions to write to this directory.
+	 /images/thumber . Thumber should have permissions to write to this directory
 
 Example usage:
 	{exp:thumber:create src="/uploads/documents/yourfile.pdf" page='1' extension='jpg' height='250' class='awesome' title='Click to download' link='yes'}
 
 Parameters:
- - src: The source PDF. This parameter is required.
- - width: The width of the generated thumbnail.
- - height: The height of the generated thumbnail.
- - page: The page of the PDF used to generate the thumbnail. [Default: 1]
- - extension: The file type of the generated thumbnail. [Default: png]
- - link: Wrap the thumbnail in a link to the PDF. [Default: no]
+ - src: The source PDF. [Required]
+ - width: The width of the generated thumbnail
+ - height: The height of the generated thumbnail
+ - page: The page of the PDF used to generate the thumbnail [Default: 1]
+ - extension: The file type of the generated thumbnail [Default: png]
+ - link: Wrap the thumbnail in a link to the PDF [Default: no]
 
 Any other parameters will be passed directly to the generated html snippet - so if you want to add an id or class, just add them as parameters.
 
 Todos:
- - We plan to add a crop parameter, to determine whether the thumbnail should be cropped.
+ - We plan to add a crop parameter, to determine whether the thumbnail should be cropped
 <?php
 		$buffer = ob_get_contents();
 		ob_end_clean();

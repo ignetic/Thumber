@@ -2,7 +2,7 @@
 
 __Creates image thumbnails from PDF files.__
 
-Thumber generates a thumbnail for your PDFs. You can call it using a single tag in your template.
+Thumber generates thumbnails from your PDFs. You can call it using a single tag in your template.
 
 ### Requirements:
  - This plugin requires [ImageMagick](http://www.imagemagick.org/) and [Ghostscript](http://www.ghostscript.com/) to be installed
