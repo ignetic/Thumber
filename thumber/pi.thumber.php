@@ -97,9 +97,6 @@ class Thumber {
     $this->base = $_SERVER['DOCUMENT_ROOT'];
     $this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($this->base . '/' . $this->thumb_cache_rel_dirname);
     
-    $this->lib_check = $this->lib_check();
-    $this->cache_folder_check = $this->cache_folder_check();
-    
     $this->EE->TMPL->log_item('** constructor called **');
   }
   
@@ -211,11 +208,11 @@ class Thumber {
       return;
     }
         
-    if(!$this->lib_check) {
+    if(!$this->lib_check()) {
       return;
     }
 
-    if(!$this->cache_folder_check) {
+    if(!$this->cache_folder_check()) {
       return;
     }
     
