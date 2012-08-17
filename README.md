@@ -2,11 +2,7 @@
 
 __Creates image thumbnails from PDF files.__
 
-Thumber generates thumbnails from your PDFs. You can call it using a single tag in your template.
-
-### Requirements:
- - This plugin requires [ImageMagick](http://www.imagemagick.org/) and [Ghostscript](http://www.ghostscript.com/) to be installed
- - You should create a directory for your cached thumbnails to live. The default directory is specified as `/images/thumber`. Thumber should have permissions to write to this directory
+_Thumber_ generates thumbnails from your PDFs. You can call it using a single tag in your template.
 
 ### Example usage:
 
@@ -21,8 +17,15 @@ Thumber generates thumbnails from your PDFs. You can call it using a single tag 
  - `page`: The page of the PDF used to generate the thumbnail ___[Default: 1]___
  - `extension`: The file type of the generated thumbnail ___[Default: png]___
  - `link`: Wrap the thumbnail in a link to the PDF ___[Default: no]___
+ - `crop`: Where `width` and `height` are both specified, crop to preserve aspect ratio ___[Default: no]___
 
 Any other parameters will be passed directly to the generated html snippet - so if you want to add an `id` or `class`, just add them as parameters.
 
+### Requirements:
+ - This plugin requires [ImageMagick](http://www.imagemagick.org/) and [Ghostscript](http://www.ghostscript.com/) to be installed
+ - You should create a directory for your cached thumbnails to live. The default directory is specified as `/images/thumber`. _Thumber_ should have permissions to write to this directory
+
 ### Todos:
- - We plan to add a `crop` parameter, to determine whether the thumbnail should be cropped
+ - Improve caching (e.g. add an expiry time to cached images)
+ - Add more parameters, e.g. `max_width`, `max_height`
+ - Allow for tag pairs as well as single tags

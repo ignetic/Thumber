@@ -274,11 +274,6 @@ class Thumber {
 
 Thumber generates thumbnails from your PDFs. You can call it using a single tag in your template.
 
-Requirements:
- - This plugin requires ImageMagick and Ghostscript to be installed
- - You should create a directory for your cached thumbnails to live. The default directory is specified as
-	 /images/thumber . Thumber should have permissions to write to this directory
-
 Example usage:
 	{exp:thumber:create src="/uploads/documents/yourfile.pdf" page='1' extension='jpg' height='250' class='awesome' title='Click to download' link='yes'}
 
@@ -289,6 +284,7 @@ Parameters:
  - page: The page of the PDF used to generate the thumbnail [Default: 1]
  - extension: The file type of the generated thumbnail [Default: png]
  - link: Wrap the thumbnail in a link to the PDF [Default: no]
+ - crop: Where width and height are both specified, crop to preserve aspect ratio [Default: no]
 
 Any other parameters will be passed directly to the generated html snippet - so if you want to add an id or class, just add them as parameters.
 <?php
