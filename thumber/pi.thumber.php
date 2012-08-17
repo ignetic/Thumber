@@ -277,8 +277,8 @@ Example usage:
 
 Parameters:
  - src: The source PDF. [Required]
- - width: The width of the generated thumbnail
- - height: The height of the generated thumbnail
+ - width: The width of the generated thumbnail [Default: 84]
+ - height: The height of the generated thumbnail [Default: 108]
  - page: The page of the PDF used to generate the thumbnail [Default: 1]
  - extension: The file type of the generated thumbnail [Default: png]
  - link: Wrap the thumbnail in a link to the PDF [Default: no]

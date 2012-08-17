@@ -12,8 +12,8 @@ _Thumber_ generates thumbnails from your PDFs. You can call it using a single ta
 
 ### Parameters:
  - `src`: The source PDF ___[Required]___
- - `width`: The width of the generated thumbnail
- - `height`: The height of the generated thumbnail
+ - `width`: The width of the generated thumbnail ___[Default: 84]___
+ - `height`: The height of the generated thumbnail ___[Default: 108]___
  - `page`: The page of the PDF used to generate the thumbnail ___[Default: 1]___
  - `extension`: The file type of the generated thumbnail ___[Default: png]___
  - `link`: Wrap the thumbnail in a link to the PDF ___[Default: no]___
