@@ -49,7 +49,7 @@ class Thumber {
 			// TODO: width and height should be a single param here
 			'width'		=> '84',
 			'height'		=> '108',
-			'crop'		=> 'no', // not currently used
+			'crop'		=> 'no',
 			'page'		=> '1',
 			'extension'		=> 'png',
 			'link'		=> 'no'
@@ -175,14 +175,18 @@ class Thumber {
 	private function generate_conversion($source, $dest) {
 		$page = intval($this->params["page"]) - 1;
 		
-		// Force the specified dimensions, even if it means not preserving aspect ratio
-		$force_dimensions = ($this->params["width"] && $this->params["height"]) ? '!' : '';
-		
-		if($this->params['crop'] == 'yes') {
-			// TODO: Sort out cropping
+		$modifier = '';
+		if ($this->params["width"] && $this->params["height"]) {
+			if($this->params['crop'] == 'yes') {
+				$modifier = '^ -gravity center -extent ' . $this->params["dimensions"];
+			} else {
+				// This modifier forces the specified dimensions,
+				// even if it means not preserving aspect ratio
+				$modifier = '!';
+			}
 		}
 		
-		$exec_str = "convert -resize " . $this->params["dimensions"] . $force_dimensions . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
+		$exec_str = "convert -resize " . $this->params["dimensions"] . $modifier . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
 		
 		$error = exec($exec_str);
 		
@@ -224,7 +228,7 @@ class Thumber {
 	  $dest = array();
 	  $dest["dirname"] = $this->thumb_cache_dirname;
 	  
-	  $cropped = ($this->params["crop"] == 'yes') ? '_cropped' : '';
+	  $cropped = ($this->params["width"] && $this->params["height"] && $this->params["crop"] == 'yes') ? '_cropped' : '';
 	  $param_str = '_pg' . $this->params["page"] . '_' .  $this->params["dimensions"] . $cropped;
 	  $dest["basename"] = $source["filename"] . $param_str . "." . $this->params["extension"];
 		$dest["fullpath"] = $this->thumb_cache_dirname . '/' . $dest["basename"];
@@ -287,9 +291,6 @@ Parameters:
  - link: Wrap the thumbnail in a link to the PDF [Default: no]
 
 Any other parameters will be passed directly to the generated html snippet - so if you want to add an id or class, just add them as parameters.
-
-Todos:
- - We plan to add a crop parameter, to determine whether the thumbnail should be cropped
 <?php
 		$buffer = ob_get_contents();
 		ob_end_clean();
