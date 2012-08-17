@@ -95,7 +95,7 @@ class Thumber {
 	{
 		$this->EE =& get_instance();
 		$this->base = $_SERVER['DOCUMENT_ROOT'];
-		$this->thumb_cache_dirname = $this->base . $this->thumb_cache_rel_dirname;
+		$this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($this->base . '/' . $this->thumb_cache_rel_dirname);
 		
 		$this->lib_check = $this->lib_check();
 		$this->cache_folder_check = $this->cache_folder_check();
@@ -228,13 +228,17 @@ class Thumber {
 	  $dest = array();
 	  $dest["dirname"] = $this->thumb_cache_dirname;
 	  
+	  // create dest filename
 	  $cropped = ($this->params["width"] && $this->params["height"] && $this->params["crop"] == 'yes') ? '_cropped' : '';
 	  $param_str = '_pg' . $this->params["page"] . '_' .  $this->params["dimensions"] . $cropped;
-	  $dest["basename"] = $source["filename"] . $param_str . "." . $this->params["extension"];
-		$dest["fullpath"] = $this->thumb_cache_dirname . '/' . $dest["basename"];
-		$dest = array_merge($dest, pathinfo($dest["fullpath"]));
-		
-		$dest["url"] = $this->thumb_cache_rel_dirname . '/' . $dest["basename"];
+	  $dest["filename"] = $source["filename"] . $param_str;
+	  
+	  // add the rest of the dest array items
+	  $dest["extension"] = $this->params["extension"];
+	  $dest["basename"] = $dest["filename"] . "." . $dest["extension"];
+		$dest["fullpath"] = $this->EE->functions->remove_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
+		$dest["url"] = $this->EE->functions->remove_double_slashes($this->EE->config->item('site_url') . '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
+		die(var_dump($dest));
 	  
 	  // check whether the image is cached
 	  if (!file_exists($dest["fullpath"])) {
@@ -286,7 +290,7 @@ Parameters:
  - link: Wrap the thumbnail in a link to the PDF [Default: no]
  - crop: Where width and height are both specified, crop to preserve aspect ratio [Default: no]
 
-Any other parameters will be passed directly to the generated html snippet - so if you want to add an id or class, just add them as parameters.
+Any other parameters will be added to the img tag in the the generated html snippet - so if you want to add an id or class, just add them as parameters.
 <?php
 		$buffer = ob_get_contents();
 		ob_end_clean();
