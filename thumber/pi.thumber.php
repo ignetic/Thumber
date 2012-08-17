@@ -49,7 +49,7 @@ class Thumber {
       // TODO: width and height should be a single param here
       'width' => '84',
       'height' => '108',
-      'crop' => 'no',
+      'crop' => 'yes',
       'page' => '1',
       'extension' => 'png',
       'link' => 'no'
@@ -283,7 +283,7 @@ Parameters:
  - height: The height of the generated thumbnail
  - page: The page of the PDF used to generate the thumbnail [Default: 1]
  - extension: The file type of the generated thumbnail [Default: png]
- - link: Wrap the thumbnail in a link to the PDF [Default: no]
+ - link: Wrap the thumbnail in a link to the PDF [Default: yes]
  - crop: Where width and height are both specified, crop to preserve aspect ratio [Default: no]
 
 Any other parameters will be added to the img tag in the the generated html snippet - so if you want to add an id or class, just add them as parameters.
