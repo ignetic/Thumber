@@ -83,7 +83,7 @@ class Thumber {
       }
     }
     
-    // This is just for convenience
+    // this is just for convenience
     $this->params['dimensions'] = $this->params['width'] . 'x' . $this->params['height'];
   }
 
@@ -103,14 +103,14 @@ class Thumber {
   private function lib_check()
   {
     if (exec("convert -version 2>&1")) {
-      $this->EE->TMPL->log_item('**Thumber** Can\'t find Imagemagick on your server.');
+      $this->EE->TMPL->log_item('**Thumber** Can\'t find ImageMagick on your server.');
       return false;
     }
     
 /*
     // TODO: check if ghostscript is installed
     if (ghostscript is not installed) {
-      $this->EE->TMPL->log_item('**Thumber** Can\'t find ghostscript on your server.');
+      $this->EE->TMPL->log_item('**Thumber** Can\'t find Ghostscript on your server.');
       return false;
     }
 */
@@ -145,7 +145,7 @@ class Thumber {
       return false;
     }
     
-    //check if the source URL is an absolute URL
+    // check if the source URL is an absolute URL
     if ( substr( $src_url, 0, 4 ) == 'http' )
     {
       $url = parse_url( $src_url );
