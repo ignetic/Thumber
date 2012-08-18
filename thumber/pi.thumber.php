@@ -46,7 +46,6 @@ class Thumber {
     /**  Initialise default parameters
     /** -------------------------------------*/
     $default_params = array(
-      // TODO: width and height should be a single param here
       'width' => '84',
       'height' => '108',
       'crop' => 'yes',
@@ -99,7 +98,7 @@ class Thumber {
   }
   
   /** 
-   * Check imagemagick and ghostscript are installed
+   * Check ImageMagick and Ghostscript are installed
    */
   private function lib_check()
   {
@@ -164,7 +163,7 @@ class Thumber {
   }
   
   /** 
-   * This is where the heavy lifting happens! Call imagemagick to actually generate the thumbnail
+   * This is where the heavy lifting happens! Call ImageMagick to actually generate the thumbnail
    * according to the specified parameters
    */
   private function generate_conversion($source, $dest) {
@@ -234,9 +233,9 @@ class Thumber {
     $dest["fullpath"] = $this->EE->functions->remove_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
     $dest["url"] = $this->EE->functions->remove_double_slashes($this->EE->config->item('site_url') . '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
     
-    // check whether the image is cached
+    // check whether we have a cached version of the thumbnail
     if (!file_exists($dest["fullpath"])) {
-      // convert pdf to thumb.png
+      // if it isn't, generate the thumbnail
       $success = $this->generate_conversion($source, $dest);
       if(!$success) {
         return;
