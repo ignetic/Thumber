@@ -2,7 +2,7 @@
 
 __Creates image thumbnails from PDF files.__
 
-_Thumber_ generates thumbnails from your PDFs. You can call it using a single tag in your template.
+_Thumber_ generates thumbnails from your PDFs. You can call _thumber_ using a single tag in your template.
 
 ### Example usage:
 
@@ -19,7 +19,7 @@ _Thumber_ generates thumbnails from your PDFs. You can call it using a single ta
  - `link`: Wrap the thumbnail in a link to the PDF ___[Default: no]___
  - `crop`: Where `width` and `height` are both specified, crop to preserve aspect ratio ___[Default: yes]___
 
-Any other parameters will be added to the `img` tag in the the generated html snippet - so if you want to add an `id` or `class`, just add them as parameters.
+Any other parameters will be added to the `img` tag in the the generated html snippet – so if you want to add an `id` or `class`, just add them as parameters.
 
 ### Requirements:
  - This plugin requires [ImageMagick](http://www.imagemagick.org/) and [Ghostscript](http://www.ghostscript.com/)
@@ -29,3 +29,4 @@ Any other parameters will be added to the `img` tag in the the generated html sn
  - Improve caching (e.g. add an expiry time to cached images)
  - Add more parameters, e.g. `max_width`, `max_height`
  - Allow for tag pairs as well as single tags
+ - Generate thumbnails for remotely hosted PDFs

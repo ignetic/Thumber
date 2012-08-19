@@ -149,6 +149,12 @@ class Thumber {
     if ( substr( $src_url, 0, 4 ) == 'http' )
     {
       $url = parse_url( $src_url );
+/*
+      if ('http://' . $url['host'] . '/' != $this->EE->config->item('site_url')) {
+	      $this->EE->TMPL->log_item('**Thumber** Your PDF file must be stored locally.');
+	      return false;
+      }
+*/
       $src_url = $url['path'];
     }
     
