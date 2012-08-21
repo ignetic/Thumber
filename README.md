@@ -22,11 +22,12 @@ _Thumber_ generates thumbnails from your PDFs. You can call _thumber_ using a si
 Any other parameters will be added to the `img` tag in the the generated html snippet – so if you want to add an `id` or `class`, just add them as parameters.
 
 ### Requirements:
- - This plugin requires [ImageMagick](http://www.imagemagick.org/) and [Ghostscript](http://www.ghostscript.com/)
+ - This plugin requires [ImageMagick](http://www.imagemagick.org/) (v6.3.8-2 or newer) and [Ghostscript](http://www.ghostscript.com/)
  - You must create a directory for your cached thumbnails to live. _Thumber_ must have permissions to write to this directory. The default directory is specified as `/images/thumber`
 
 ### Todos:
- - Improve caching (e.g. add an expiry time to cached images)
+ - Automatically create required directories
+ - Improve caching (e.g. add an expiry time to cached images, and run a cache cleanup)
  - Add more parameters, e.g. `max_width`, `max_height`
  - Allow for tag pairs as well as single tags
  - Generate thumbnails for remotely hosted PDFs
