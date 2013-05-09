@@ -193,7 +193,7 @@ class Thumber {
       }
     }
     
-    $exec_str = "convert -resize " . $this->params["dimensions"] . $modifier . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
+    $exec_str = "convert -colorspace RGB -resize " . $this->params["dimensions"] . $modifier . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
     
     $error = exec($exec_str);
     
