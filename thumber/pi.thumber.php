@@ -26,7 +26,7 @@
 
 $plugin_info = array(
   'pi_name' => 'Thumber',
-  'pi_version' => '1.0',
+  'pi_version' => '1.1',
   'pi_author' => 'Rob Hodges and Andy Lulham',
   'pi_author_url' => 'http://www.electricputty.co.uk',
   'pi_description' => 'Create image thumbnails from PDF files',
