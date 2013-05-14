@@ -46,13 +46,13 @@ class Thumber {
     /**  Initialise default parameters
     /** -------------------------------------*/
     $default_params = array(
-      // TODO: width and height should be a single param here
       'width' => '84',
       'height' => '108',
       'crop' => 'yes',
       'page' => '1',
       'extension' => 'png',
-      'link' => 'no'
+      'link' => 'no',
+      'base' => $_SERVER['DOCUMENT_ROOT']
     );
     
     $this->params = $default_params;
@@ -66,13 +66,20 @@ class Thumber {
       $this->params['height'] = $height;
     }
 
+
+    $this->base = $this->EE->TMPL->fetch_param('base', '');
+
+      if($this->base) {
+        $this->params['base'] = $this->base;
+      }
+
     /** -------------------------------------
     /**  Loop through input params, set values
     /** -------------------------------------*/
     if($this->EE->TMPL->tagparams) {
       foreach ($this->EE->TMPL->tagparams as $key => $value) {
         // ignore width and height as special parameters
-        if($key != 'width' && $key != 'height') {
+        if($key != 'width' && $key != 'height' && $key != 'base') {
           if (array_key_exists($key, $this->params)) {
             // if it's in the default array, it's used by the plugin
             $this->params[$key] = $value;
@@ -84,7 +91,7 @@ class Thumber {
       }
     }
     
-    // This is just for convenience
+    // this is just for convenience
     $this->params['dimensions'] = $this->params['width'] . 'x' . $this->params['height'];
   }
 
@@ -94,29 +101,24 @@ class Thumber {
   public function __construct()
   {
     $this->EE =& get_instance();
-    $this->base = $_SERVER['DOCUMENT_ROOT'];
-    $this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($this->base . '/' . $this->thumb_cache_rel_dirname);
-    
-    $this->EE->TMPL->log_item('** constructor called **');
+    $this->base = $this->EE->TMPL->fetch_param('base','');
+    if($this->base == '') {
+      $this->base = $_SERVER['DOCUMENT_ROOT'];
+    }
+    $this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
   }
   
   /** 
-   * Check imagemagick and ghostscript are installed
+   * Check ImageMagick and Ghostscript are installed
    */
   private function lib_check()
   {
     if (exec("convert -version 2>&1")) {
-      $this->EE->TMPL->log_item('**Thumber** Can\'t find Imagemagick on your server.');
+      $this->EE->TMPL->log_item('**Thumber** Can\'t find ImageMagick on your server.');
       return false;
     }
-    
-/*
-    // TODO: check if ghostscript is installed
-    if (ghostscript is not installed) {
-      $this->EE->TMPL->log_item('**Thumber** Can\'t find ghostscript on your server.');
-      return false;
-    }
-*/
+  
+    /* TODO check for Ghostscript */
     
     return true;
   }
@@ -128,8 +130,17 @@ class Thumber {
   {
     if(!file_exists($this->thumb_cache_dirname)) {
       $this->EE->TMPL->log_item('**Thumber** Cache folder: "' . $this->thumb_cache_rel_dirname . '" does not exist.');
+      /* TODO: Try to create cache directory if it doesn't exit */
+      /*
+      if(mkdir($this->thumb_cache_dirname){
+        $this->EE->TMPL->log_item('**Thumber** Cache folder successfully created at: '. $this->thumb_cache_rel_dirname);
+        return true;
+      })
+      */
       return false;
     }
+
+
     
     if(!is_writable($this->thumb_cache_dirname)) {
       $this->EE->TMPL->log_item('**Thumber** Cache folder: "' . $this->thumb_cache_rel_dirname . '" is not writable.');
@@ -148,30 +159,29 @@ class Thumber {
       return false;
     }
     
-    //check if the source URL is an absolute URL
+    // check if the source URL is an absolute URL
     if ( substr( $src_url, 0, 4 ) == 'http' )
     {
       $url = parse_url( $src_url );
+
       $src_url = $url['path'];
     }
-    
     $src_fullpath = $this->EE->functions->remove_double_slashes($this->base . $src_url);
-    
+
     if(!file_exists($src_fullpath)) {
       $this->EE->TMPL->log_item('**Thumber** Source URL: "' . $src_url . '" does not exist.');
       return false;
     }
-    
+ 
     return $src_fullpath;
   }
   
   /** 
-   * This is where the heavy lifting happens! Call imagemagick to actually generate the thumbnail
+   * This is where the heavy lifting happens! Call ImageMagick to actually generate the thumbnail
    * according to the specified parameters
    */
   private function generate_conversion($source, $dest) {
     $page = intval($this->params["page"]) - 1;
-    
     $modifier = '';
     if ($this->params["width"] && $this->params["height"]) {
       if($this->params['crop'] == 'yes') {
@@ -183,7 +193,7 @@ class Thumber {
       }
     }
     
-    $exec_str = "convert -resize " . $this->params["dimensions"] . $modifier . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
+    $exec_str = "convert -colorspace RGB -resize " . $this->params["dimensions"] . $modifier . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
     
     $error = exec($exec_str);
     
@@ -204,6 +214,7 @@ class Thumber {
     $source["url"] = trim($this->EE->TMPL->fetch_param('src'));
     
     $source["fullpath"] = $this->get_fullpath_from_url($source["url"]);
+
     if(!$source["fullpath"]) {
       return;
     }
@@ -234,11 +245,10 @@ class Thumber {
     $dest["extension"] = $this->params["extension"];
     $dest["basename"] = $dest["filename"] . "." . $dest["extension"];
     $dest["fullpath"] = $this->EE->functions->remove_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
-    $dest["url"] = $this->EE->functions->remove_double_slashes($this->EE->config->item('site_url') . '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
-    
-    // check whether the image is cached
+    $dest["url"] = $this->EE->functions->remove_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
+    // check whether we have a cached version of the thumbnail
     if (!file_exists($dest["fullpath"])) {
-      // convert pdf to thumb.png
+      // if it isn't, generate the thumbnail
       $success = $this->generate_conversion($source, $dest);
       if(!$success) {
         return;
@@ -278,16 +288,17 @@ class Thumber {
 Thumber generates thumbnails from your PDFs. You can call it using a single tag in your template.
 
 Example usage:
-  {exp:thumber:create src="/uploads/documents/yourfile.pdf" page='1' extension='jpg' height='250' class='awesome' title='Click to download' link='yes'}
+  {exp:thumber:create src='/uploads/documents/yourfile.pdf' page='2' extension='jpg' height='250' class='awesome' title='Click to download' link='yes'}
 
 Parameters:
  - src: The source PDF. [Required]
- - width: The width of the generated thumbnail
- - height: The height of the generated thumbnail
+ - base: Server path for use with files under different domains, for instance, when using MSM [Optional]
+ - width: The width of the generated thumbnail [Default: 84]
+ - height: The height of the generated thumbnail [Default: 108]
  - page: The page of the PDF used to generate the thumbnail [Default: 1]
  - extension: The file type of the generated thumbnail [Default: png]
- - link: Wrap the thumbnail in a link to the PDF [Default: yes]
- - crop: Where width and height are both specified, crop to preserve aspect ratio [Default: no]
+ - link: Wrap the thumbnail in a link to the PDF [Default: no]
+ - crop: Where width and height are both specified, crop to preserve aspect ratio [Default: yes]
 
 Any other parameters will be added to the img tag in the the generated html snippet - so if you want to add an id or class, just add them as parameters.
 <?php
