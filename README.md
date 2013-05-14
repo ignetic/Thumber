@@ -12,6 +12,7 @@ _Thumber_ generates thumbnails from your PDFs. You can call _thumber_ using a si
 
 ### Parameters:
  - `src`: The source PDF ___[Required]___
+ - `base`: Server path for use with files under different domains, for instance, when using MSM ___[Optional]___
  - `width`: The width of the generated thumbnail ___[Default: 84]___
  - `height`: The height of the generated thumbnail ___[Default: 108]___
  - `page`: The page of the PDF used to generate the thumbnail ___[Default: 1]___
