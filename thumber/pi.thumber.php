@@ -251,8 +251,11 @@ class Thumber {
       $custom_param_str .= $key . '="' . $value . '" ';
     }
     
+    // Get width height string
+    $img_width_height = getimagesize($dest["fullpath"]);
+    
     // generate html snippet
-    $html_snippet = '<img src="' . $dest["url"] . '" ' . $custom_param_str . ' />';
+    $html_snippet = '<img src="' . $dest["url"] . '" ' . $img_width_height[3] . ' ' . $custom_param_str . ' />';
     
     if($this->params["link"] == "yes") {
       $html_snippet = '<a href="' . $source["url"] . '">' . $html_snippet . '</a>';
