@@ -105,7 +105,11 @@ class Thumber {
     if($this->base == '') {
       $this->base = $_SERVER['DOCUMENT_ROOT'];
     }
-    $this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
+    if (version_compare(APP_VER, '2.6', '>=')) {
+	    $this->thumb_cache_dirname = $this->EE->functions->reduce_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
+	} else {
+		$this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
+	}
   }
   
   /** 
@@ -166,7 +170,11 @@ class Thumber {
 
       $src_url = $url['path'];
     }
-    $src_fullpath = $this->EE->functions->remove_double_slashes($this->base . $src_url);
+    if (version_compare(APP_VER, '2.6', '>=')) {
+        $src_fullpath = $this->EE->functions->reduce_double_slashes($this->base . $src_url);
+    } else {
+    	$src_fullpath = $this->EE->functions->remove_double_slashes($this->base . $src_url);
+    }
 
     if(!file_exists($src_fullpath)) {
       $this->EE->TMPL->log_item('**Thumber** Source URL: "' . $src_url . '" does not exist.');
@@ -244,8 +252,16 @@ class Thumber {
     // add the rest of the dest array items
     $dest["extension"] = $this->params["extension"];
     $dest["basename"] = $dest["filename"] . "." . $dest["extension"];
-    $dest["fullpath"] = $this->EE->functions->remove_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
-    $dest["url"] = $this->EE->functions->remove_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
+    if (version_compare(APP_VER, '2.6', '>=')) {
+        $dest["fullpath"] = $this->EE->functions->reduce_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
+    } else {
+    	$dest["fullpath"] = $this->EE->functions->remove_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
+    }
+    if (version_compare(APP_VER, '2.6', '>=')) {
+        $dest["url"] = $this->EE->functions->reduce_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
+    } else {
+    	  $dest["url"] = $this->EE->functions->remove_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
+    }
     // check whether we have a cached version of the thumbnail
     if (!file_exists($dest["fullpath"])) {
       // if it isn't, generate the thumbnail
