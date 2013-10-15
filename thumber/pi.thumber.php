@@ -106,7 +106,8 @@ class Thumber {
       $this->base = $_SERVER['DOCUMENT_ROOT'];
     }
     if (version_compare(APP_VER, '2.6', '>=')) {
-	    $this->thumb_cache_dirname = $this->EE->functions->reduce_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
+	    $this->EE->load->helper('string');
+	    $this->thumb_cache_dirname = reduce_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
 	} else {
 		$this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
 	}
@@ -171,7 +172,8 @@ class Thumber {
       $src_url = $url['path'];
     }
     if (version_compare(APP_VER, '2.6', '>=')) {
-        $src_fullpath = $this->EE->functions->reduce_double_slashes($this->base . $src_url);
+        $this->EE->load->helper('string');
+        $src_fullpath = reduce_double_slashes($this->base . $src_url);
     } else {
     	$src_fullpath = $this->EE->functions->remove_double_slashes($this->base . $src_url);
     }
@@ -253,12 +255,14 @@ class Thumber {
     $dest["extension"] = $this->params["extension"];
     $dest["basename"] = $dest["filename"] . "." . $dest["extension"];
     if (version_compare(APP_VER, '2.6', '>=')) {
-        $dest["fullpath"] = $this->EE->functions->reduce_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
+        $this->EE->load->helper('string');
+        $dest["fullpath"] = reduce_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
     } else {
     	$dest["fullpath"] = $this->EE->functions->remove_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
     }
     if (version_compare(APP_VER, '2.6', '>=')) {
-        $dest["url"] = $this->EE->functions->reduce_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
+        $this->EE->load->helper('string');
+        $dest["url"] = reduce_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
     } else {
     	  $dest["url"] = $this->EE->functions->remove_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
     }
