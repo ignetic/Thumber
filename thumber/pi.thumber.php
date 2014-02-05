@@ -76,10 +76,11 @@ class Thumber {
     /** -------------------------------------
     /**  Loop through input params, set values
     /** -------------------------------------*/
+    $ignore = array('width', 'height', 'base', 'src');
     if($this->EE->TMPL->tagparams) {
       foreach ($this->EE->TMPL->tagparams as $key => $value) {
         // ignore width and height as special parameters
-        if($key != 'width' && $key != 'height' && $key != 'base') {
+        if(!array_key_exists($key, $ignore)) {
           if (array_key_exists($key, $this->params)) {
             // if it's in the default array, it's used by the plugin
             $this->params[$key] = $value;
