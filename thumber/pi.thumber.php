@@ -11,7 +11,7 @@
  * @since   Version 2.0
  * @filesource
  */
- 
+
 // ------------------------------------------------------------------------
 
 /**
@@ -36,7 +36,7 @@ $plugin_info = array(
 
 class Thumber {
   public $return_data;
-  
+
   private $base;
   private $thumb_cache_rel_dirname = '/images/thumber';
 
@@ -54,12 +54,12 @@ class Thumber {
       'link' => 'no',
       'base' => $_SERVER['DOCUMENT_ROOT']
     );
-    
+
     $this->params = $default_params;
-    
+
     $width = $this->EE->TMPL->fetch_param('width', '');
-    $height = $this->EE->TMPL->fetch_param('height', '');    
-    
+    $height = $this->EE->TMPL->fetch_param('height', '');
+
     if ($width || $height) {
       // if either is specified, override both defaults
       $this->params['width'] = $width;
@@ -69,9 +69,9 @@ class Thumber {
 
     $this->base = $this->EE->TMPL->fetch_param('base', '');
 
-      if($this->base) {
-        $this->params['base'] = $this->base;
-      }
+    if($this->base) {
+      $this->params['base'] = $this->base;
+    }
 
     /** -------------------------------------
     /**  Loop through input params, set values
@@ -90,7 +90,7 @@ class Thumber {
         }
       }
     }
-    
+
     // this is just for convenience
     $this->params['dimensions'] = $this->params['width'] . 'x' . $this->params['height'];
   }
@@ -112,8 +112,8 @@ class Thumber {
 		$this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
 	}
   }
-  
-  /** 
+
+  /**
    * Check ImageMagick and Ghostscript are installed
    */
   private function lib_check()
@@ -122,13 +122,13 @@ class Thumber {
       $this->EE->TMPL->log_item('**Thumber** Can\'t find ImageMagick on your server.');
       return false;
     }
-  
+
     /* TODO check for Ghostscript */
-    
+
     return true;
   }
-  
-  /** 
+
+  /**
    * Check the cache folder exists and is writable
    */
   private function cache_folder_check()
@@ -146,16 +146,16 @@ class Thumber {
     }
 
 
-    
+
     if(!is_writable($this->thumb_cache_dirname)) {
       $this->EE->TMPL->log_item('**Thumber** Cache folder: "' . $this->thumb_cache_rel_dirname . '" is not writable.');
       return false;
     }
-    
+
     return true;
   }
-  
-  /** 
+
+  /**
    * Get the full path to a file from either an absolute or relative URL
    */
   private function get_fullpath_from_url($src_url) {
@@ -163,7 +163,7 @@ class Thumber {
       $this->EE->TMPL->log_item('**Thumber** No source URL provided.');
       return false;
     }
-    
+
     // check if the source URL is an absolute URL
     if ( substr( $src_url, 0, 4 ) == 'http' )
     {
@@ -182,11 +182,11 @@ class Thumber {
       $this->EE->TMPL->log_item('**Thumber** Source URL: "' . $src_url . '" does not exist.');
       return false;
     }
- 
+
     return $src_fullpath;
   }
-  
-  /** 
+
+  /**
    * This is where the heavy lifting happens! Call ImageMagick to actually generate the thumbnail
    * according to the specified parameters
    */
@@ -202,33 +202,33 @@ class Thumber {
         $modifier = '!';
       }
     }
-    
+
     $exec_str = "convert -colorspace RGB -resize " . $this->params["dimensions"] . $modifier . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
-    
+
     $error = exec($exec_str);
-    
+
     if($error) {
       $this->EE->TMPL->log_item('**Thumber** ' . $error);
       return false;
     }
-    
+
     return true;
   }
-  
-  /** 
+
+  /**
    * The function to be called from templates in order to generate thumbnails from PDFs
    */
   public function create()
   {
     $source = array();
     $source["url"] = trim($this->EE->TMPL->fetch_param('src'));
-    
+
     $source["fullpath"] = $this->get_fullpath_from_url($source["url"]);
 
     if(!$source["fullpath"]) {
       return;
     }
-        
+
     if(!$this->lib_check()) {
       return;
     }
@@ -236,21 +236,21 @@ class Thumber {
     if(!$this->cache_folder_check()) {
       return;
     }
-    
+
     // populate param and custom_param arrays
     $this->fetch_params();
-    
+
     $source = array_merge($source, pathinfo($source["fullpath"]));
-    
+
     // create dest array
     $dest = array();
     $dest["dirname"] = $this->thumb_cache_dirname;
-    
+
     // create dest filename
     $cropped = ($this->params["width"] && $this->params["height"] && $this->params["crop"] == 'yes') ? '_cropped' : '';
     $param_str = '_pg' . $this->params["page"] . '_' .  $this->params["dimensions"] . $cropped;
     $dest["filename"] = $source["filename"] . $param_str;
-    
+
     // add the rest of the dest array items
     $dest["extension"] = $this->params["extension"];
     $dest["basename"] = $dest["filename"] . "." . $dest["extension"];
@@ -274,29 +274,29 @@ class Thumber {
         return;
       }
     }
-    
+
     // generate custom param string
     $custom_param_str = '';
     foreach($this->custom_params as $key => $value) {
       $custom_param_str .= $key . '="' . $value . '" ';
     }
-    
+
     // Get width height string
     $img_width_height = getimagesize($dest["fullpath"]);
-    
+
     // generate html snippet
     $html_snippet = '<img src="' . $dest["url"] . '" ' . $img_width_height[3] . ' ' . $custom_param_str . ' />';
-    
+
     if($this->params["link"] == "yes") {
       $html_snippet = '<a href="' . $source["url"] . '">' . $html_snippet . '</a>';
     }
-    
+
     return $html_snippet;
   }
 
 
   // ----------------------------------------------------------------
-  
+
   /**
    * Plugin Usage
    */
