@@ -26,8 +26,8 @@
 
 $plugin_info = array(
   'pi_name' => 'Thumber',
-  'pi_version' => '1.1',
-  'pi_author' => 'Rob Hodges and Andy Lulham',
+  'pi_version' => '1.2',
+  'pi_author' => 'Rob Hodges and Andy Lulham (w/ Tim Kelty, Pete Eveleigh)',
   'pi_author_url' => 'http://www.electricputty.co.uk',
   'pi_description' => 'Create image thumbnails from PDF files',
   'pi_usage' => Thumber::usage()
@@ -39,6 +39,8 @@ class Thumber {
 
   private $base;
   private $thumb_cache_rel_dirname = '/images/thumber';
+  private $convert_bin = 'convert';
+  private $gs_bin = 'gs';
 
   private function fetch_params()
   {
@@ -103,15 +105,26 @@ class Thumber {
   {
     $this->EE =& get_instance();
     $this->base = $this->EE->TMPL->fetch_param('base','');
+    $this->EE->load->helper('string');
     if($this->base == '') {
       $this->base = $_SERVER['DOCUMENT_ROOT'];
     }
-    if (version_compare(APP_VER, '2.6', '>=')) {
-	    $this->EE->load->helper('string');
-	    $this->thumb_cache_dirname = reduce_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
-	} else {
-		$this->thumb_cache_dirname = $this->EE->functions->remove_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
-	}
+
+    // Set the image cache relative link
+    if ($this->EE->config->item('thumber_cache_dir') !== FALSE) {
+      $this->thumb_cache_rel_dirname = $this->EE->config->item('thumber_cache_dir');
+    }
+    $this->thumb_cache_dirname = reduce_double_slashes($_SERVER['DOCUMENT_ROOT'] . '/' . $this->thumb_cache_rel_dirname);
+
+    // Override the convert bin?
+    if ($this->EE->config->item('thumber_convert_bin') !== FALSE) {
+      $this->convert_bin = $this->EE->config->item('thumber_convert_bin');
+    }
+
+    // Override the gs bin?
+    if ($this->EE->config->item('thumber_gs_bin') !== FALSE) {
+      $this->gs_bin = $this->EE->config->item('thumber_gs_bin');
+    }
   }
 
   /**
@@ -119,12 +132,15 @@ class Thumber {
    */
   private function lib_check()
   {
-    if (exec("convert -version 2>&1")) {
+    if (exec($this->convert_bin . " -version 2>&1")) {
       $this->EE->TMPL->log_item('**Thumber** Can\'t find ImageMagick on your server.');
       return false;
     }
 
-    /* TODO check for Ghostscript */
+    if (!is_numeric(exec($this->gs_bin . " --version 2>&1"))) {
+      $this->EE->TMPL->log_item('**Thumber** Can\'t find Ghostscript on your server.');
+      return false;
+    }
 
     return true;
   }
@@ -145,8 +161,6 @@ class Thumber {
       */
       return false;
     }
-
-
 
     if(!is_writable($this->thumb_cache_dirname)) {
       $this->EE->TMPL->log_item('**Thumber** Cache folder: "' . $this->thumb_cache_rel_dirname . '" is not writable.');
@@ -172,12 +186,9 @@ class Thumber {
 
       $src_url = $url['path'];
     }
-    if (version_compare(APP_VER, '2.6', '>=')) {
-        $this->EE->load->helper('string');
-        $src_fullpath = reduce_double_slashes($this->base . $src_url);
-    } else {
-    	$src_fullpath = $this->EE->functions->remove_double_slashes($this->base . $src_url);
-    }
+
+    $this->EE->load->helper('string');
+    $src_fullpath = reduce_double_slashes($this->base . $src_url);
 
     if(!file_exists($src_fullpath)) {
       $this->EE->TMPL->log_item('**Thumber** Source URL: "' . $src_url . '" does not exist.');
@@ -192,8 +203,25 @@ class Thumber {
    * according to the specified parameters
    */
   private function generate_conversion($source, $dest) {
-    $page = intval($this->params["page"]) - 1;
-    $modifier = '';
+    $page = intval($this->params["page"]);
+    $gs_opts = array(
+      "-dSAFER",
+    "-dBATCH",
+    "-dNOPAUSE",
+    "-dNOCACHE",
+    "-dNOPLATFONTS",
+    "-sDEVICE=png16m",
+    "-dTextAlphaBits=4",
+    "-dGraphicsAlphaBits=4",
+    "-dCompatibilityLevel=1.4",
+    "-dColorConversionStrategy=/sRGB",
+    "-dProcessColorModel=/DeviceRGB",
+    "-dUseCIEColor=true",
+    "-r150",
+    "-dFirstPage=" . $page,
+    "-dLastPage=" . $page,
+    "-sOutputFile=" . $dest["fullpath"] . ' ' . $source['fullpath'],
+    );
     if ($this->params["width"] && $this->params["height"]) {
       if($this->params['crop'] == 'yes') {
         $modifier = '^ -gravity center -extent ' . $this->params["dimensions"];
@@ -204,11 +232,16 @@ class Thumber {
       }
     }
 
-    $exec_str = "convert -colorspace RGB -resize " . $this->params["dimensions"] . $modifier . ' ' . $source['fullpath'] . "[" . $page . "] " . $dest["fullpath"] . " 2>&1";
-
+    $convert_opts = array(
+      "-resize " . $this->params["dimensions"] . $modifier,
+      $dest['fullpath'],
+      $dest['fullpath'],
+    );
+    $exec_str = $this->gs_bin . " " . implode(' ', $gs_opts) . " && " . $this->convert_bin . " " . implode(' ', $convert_opts) . " 2>&1";
     $error = exec($exec_str);
 
-    if($error) {
+    // Ghostscript will output "Page x"
+    if($error && !preg_match('/^Page/', $error)) {
       $this->EE->TMPL->log_item('**Thumber** ' . $error);
       return false;
     }
@@ -255,18 +288,10 @@ class Thumber {
     // add the rest of the dest array items
     $dest["extension"] = $this->params["extension"];
     $dest["basename"] = $dest["filename"] . "." . $dest["extension"];
-    if (version_compare(APP_VER, '2.6', '>=')) {
-        $this->EE->load->helper('string');
-        $dest["fullpath"] = reduce_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
-    } else {
-    	$dest["fullpath"] = $this->EE->functions->remove_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
-    }
-    if (version_compare(APP_VER, '2.6', '>=')) {
-        $this->EE->load->helper('string');
-        $dest["url"] = reduce_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
-    } else {
-    	  $dest["url"] = $this->EE->functions->remove_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
-    }
+    $this->EE->load->helper('string');
+    $dest["fullpath"] = reduce_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
+    $dest["url"] = reduce_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
+
     // check whether we have a cached version of the thumbnail
     if (!file_exists($dest["fullpath"])) {
       // if it isn't, generate the thumbnail
@@ -292,7 +317,8 @@ class Thumber {
       $html_snippet = '<a href="' . $source["url"] . '">' . $html_snippet . '</a>';
     }
 
-    return $html_snippet;
+    return $this->EE->TMPL->fetch_param('url_only') == 'yes' ? $dest["url"] : $html_snippet;
+
   }
 
 
@@ -320,8 +346,25 @@ Parameters:
  - extension: The file type of the generated thumbnail [Default: png]
  - link: Wrap the thumbnail in a link to the PDF [Default: no]
  - crop: Where width and height are both specified, crop to preserve aspect ratio [Default: yes]
+ - url_only: Return the url of the image only [Default: no]
+
+Optional config overrides:
+Set these in your config.php to override default values
+
+- $config['thumber_cache_dir']   // Cache dir relative to public root [Default: /images/thumber]
+- $config['thumber_gs_bin']      // Ghostscript "gs" binary [Default: gs]
+- $config['thumber_convert_bin'] // Imagemagick "convert" binary [Default: convert]
 
 Any other parameters will be added to the img tag in the the generated html snippet - so if you want to add an id or class, just add them as parameters.
+
+If using Homebrew:
+Imagemagick/Ghostscript installed with Homebrew will likely be located in "/usr/local/bin". If so, use the config override like so:
+$config['thumber_convert_bin'] = '/usr/local/bin/convert'
+
+If running with MAMP:
+If you get errors complaining about incompatible DYLD libraries, try putting this somewhere before the plugin is loaded (e.g. config.php, index.php):
+putenv("DYLD_LIBRARY_PATH=");
+
 <?php
     $buffer = ob_get_contents();
     ob_end_clean();
