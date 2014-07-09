@@ -222,6 +222,8 @@ class Thumber {
     "-dLastPage=" . $page,
     "-sOutputFile=" . $dest["fullpath"] . ' ' . $source['fullpath'],
     );
+
+    $modifier = '';
     if ($this->params["width"] && $this->params["height"]) {
       if($this->params['crop'] == 'yes') {
         $modifier = '^ -gravity center -extent ' . $this->params["dimensions"];
