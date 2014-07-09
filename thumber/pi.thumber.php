@@ -292,7 +292,7 @@ class Thumber {
     $dest["basename"] = $dest["filename"] . "." . $dest["extension"];
     $this->EE->load->helper('string');
     $dest["fullpath"] = reduce_double_slashes($this->thumb_cache_dirname . '/' . $dest["basename"]);
-    $dest["url"] = reduce_double_slashes( '/' . $this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
+    $dest["url"] = reduce_double_slashes($this->thumb_cache_rel_dirname . '/' . $dest["basename"]);
 
     // check whether we have a cached version of the thumbnail
     if (!file_exists($dest["fullpath"])) {
