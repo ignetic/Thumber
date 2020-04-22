@@ -78,7 +78,8 @@ class Thumber {
     /** -------------------------------------
     /**  Loop through input params, set values
     /** -------------------------------------*/
-    $ignore = array('width', 'height', 'base', 'src');
+// Added 'path' to prevent output of path in HTML source
+    $ignore = array('width', 'height', 'base', 'src', 'path');
     if($this->EE->TMPL->tagparams) {
       foreach ($this->EE->TMPL->tagparams as $key => $value) {
         // ignore width and height as special parameters
@@ -103,7 +104,7 @@ class Thumber {
    */
   public function __construct()
   {
-    $this->EE =& get_instance();
+    $this->EE = get_instance();
     $this->base = $this->EE->TMPL->fetch_param('base','');
     $this->EE->load->helper('string');
     if($this->base == '') {
@@ -132,15 +133,21 @@ class Thumber {
    */
   private function lib_check()
   {
-    if (exec($this->convert_bin . " -version 2>&1")) {
-      $this->EE->TMPL->log_item('**Thumber** Can\'t find ImageMagick on your server.');
-      return false;
-    }
+	// is exec() disabled?
+	if (function_exists('exec')) { 
+		if (exec($this->convert_bin . " -version 2>&1")) {
+		  $this->EE->TMPL->log_item('**Thumber** Can\'t find ImageMagick on your server.');
+		  return false;
+		}
 
-    if (!is_numeric(exec($this->gs_bin . " --version 2>&1"))) {
-      $this->EE->TMPL->log_item('**Thumber** Can\'t find Ghostscript on your server.');
-      return false;
-    }
+		if (!is_numeric(exec($this->gs_bin . " --version 2>&1"))) {
+		  $this->EE->TMPL->log_item('**Thumber** Can\'t find Ghostscript on your server.');
+		  return false;
+		}
+	} elseif ( ! extension_loaded('imagick')) {
+		$this->EE->TMPL->log_item('**Thumber** Can\'t find imagick extension on your server.');
+		return false;
+	}
 
     return true;
   }
@@ -259,7 +266,11 @@ class Thumber {
     $source = array();
     $source["url"] = trim($this->EE->TMPL->fetch_param('src'));
 
-    $source["fullpath"] = $this->get_fullpath_from_url($source["url"]);
+    // allow path below root with 'path' parameter
+    $source["fullpath"] = trim($this->EE->TMPL->fetch_param('path'));
+    if(!$source["fullpath"]) {
+    	$source["fullpath"] = $this->get_fullpath_from_url($source["url"]);
+    }
 
     if(!$source["fullpath"]) {
       return;
